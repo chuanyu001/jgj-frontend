@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>监管局内部管理系统</title>
+    <style>
+        /* 基础重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* 优化的色彩系统 */
+            --primary: #2c3e50;
+            --primary-light: #34495e;
+            --secondary: #3498db;
+            --secondary-light: #5dade2;
+            --accent: #1abc9c;
+            --accent-light: #2ecc71;
+            --background: #f8f9fa;
+            --surface: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --text-tertiary: #95a5a6;
+            --border: #ecf0f1;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition-fast: 0.2s ease;
+            --transition-base: 0.3s ease;
+            --transition-slow: 0.4s ease;
+        }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+        }
+
+        /* 移除之前的背景装饰 */
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ==================== 顶部导航栏 ==================== */
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            height: 64px;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title::before {
+            content: '';
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: var(--radius-md);
+            transition: background-color var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .user-info:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .notification {
+            position: relative;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .notification:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background-color: #e74c3c;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* ==================== 主菜单区域 ==================== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 24px;
+        }
+
+        /* 一级菜单 */
+        .system-nav {
+            margin: 24px 0 0;
+            padding: 0;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .system-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .system-menu {
+            padding: 16px 24px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .system-menu:hover {
+            color: var(--primary);
+        }
+
+        .system-menu.active {
+            color: var(--secondary);
+            border-bottom-color: var(--secondary);
+        }
+
+        .system-menu.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 24px;
+            right: 24px;
+            height: 2px;
+            background: var(--secondary);
+            border-radius: 1px;
+        }
+
+        /* 二级菜单 */
+        .sub-nav {
+            padding: 20px 0;
+            display: flex;
+            gap: 12px;
+        }
+
+        .sub-menu {
+            padding: 10px 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            font-weight: 500;
+        }
+
+        .sub-menu:hover {
+            color: var(--secondary);
+            border-color: var(--secondary);
+            transform: translateY(-1px);
+        }
+
+        .sub-menu.active {
+            color: white;
+            background: var(--secondary);
+            border-color: var(--secondary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* ==================== 内容区域 ==================== */
+        .content-section {
+            flex: 1;
+            padding: 20px 0 40px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 功能卡片 */
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-card:hover {
+            border-color: var(--secondary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            transform: scaleX(0);
+            transition: transform var(--transition-base);
+            transform-origin: left;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            background: linear-gradient(135deg, var(--secondary-light), var(--secondary));
+            color: white;
+            flex-shrink: 0;
+            transition: transform var(--transition-base);
+        }
+
+        .feature-card:hover .card-icon {
+            transform: rotate(8deg) scale(1.05);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            line-height: 1.4;
+        }
+
+        .card-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-top: 8px;
+            flex: 1;
+        }
+
+        /* card-footer and status badges removed per design update */
+
+        /* ==================== 空状态 ==================== */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.4;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+
+        /* ==================== 响应式设计 ==================== */
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                height: 60px;
+                padding: 0 16px;
+            }
+
+            .main-content {
+                padding: 0 16px;
+            }
+
+            .system-nav {
+                margin-top: 16px;
+                gap: 4px;
+            }
+
+            .system-menu {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+
+            .sub-nav {
+                padding: 16px 0;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .sub-menu {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .feature-card {
+                padding: 24px;
+            }
+
+            .card-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 22px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .user-name {
+                display: none;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+
+        /* ==================== 用户菜单 ==================== */
+        .user-menu {
+            position: absolute;
+            top: 56px;
+            right: 16px;
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            min-width: 160px;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all var(--transition-base);
+            z-index: 1001;
+        }
+
+        .user-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-menu-item {
+            padding: 14px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: background-color var(--transition-fast);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-menu-item:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+            color: var(--secondary);
+        }
+
+        .user-menu-item::before {
+            content: '→';
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        /* ==================== 滚动条美化 ==================== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* ==================== 加载动画 ==================== */
+        .content-loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--secondary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航栏 -->
+        <div class="header">
+            <div class="header-title">监管局内部管理系统</div>
+            <div class="header-right">
+                <div class="notification">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
+                    </svg>
+                    <span class="notification-badge"></span>
+                </div>
+                <div class="user-info" id="userInfo">
+                    <div class="user-avatar" id="userAvatar">登</div>
+                    <div class="user-name" id="userName">登录</div>
+                </div>
+            </div>
+            
+            <!-- 用户菜单 (已登录时显示) -->
+            <div class="user-menu" id="userMenu">
+                <div class="user-menu-item" id="logoutBtn">退出登录</div>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 一级菜单 -->
+            <div class="system-nav" id="systemNav">
+                <div class="system-menu active" data-system="approval">行政审批事项内部审查系统</div>
+                <div class="system-menu" data-system="task">工作任务管理系统</div>
+                <div class="system-menu" data-system="supervision">非现场监管系统</div>
+            </div>
+
+            <!-- 二级菜单（动态渲染） -->
+            <div class="sub-nav" id="subNav"></div>
+
+            <!-- 内容区域 -->
+            <div class="content-section">
+                <div class="content-grid" id="contentGrid">
+                    <!-- 功能卡片将通过JavaScript动态加载 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 登录状态管理
+        let isLoggedIn = false;
+        const LOGIN_KEY = 'regulatory_login_status';
+        const LOGIN_USERNAME_KEY = 'regulatory_username';
+        const LOGIN_AVATAR_TEXT_KEY = 'regulatory_avatar_text';
+        
+        // 初始化登录状态
+        function initLoginStatus() {
+            const loginStatus = localStorage.getItem(LOGIN_KEY);
+            isLoggedIn = loginStatus === 'true';
+            
+            if (isLoggedIn) {
+                // 从localStorage获取用户信息
+                const username = localStorage.getItem(LOGIN_USERNAME_KEY) || '管理员';
+                const avatarText = localStorage.getItem(LOGIN_AVATAR_TEXT_KEY) || '管';
+                
+                // 更新UI显示
+                document.getElementById('userName').textContent = username;
+                document.getElementById('userAvatar').textContent = avatarText;
+                
+                // 显示用户菜单
+                setupLoggedInMenu();
+            } else {
+                // 未登录状态
+                document.getElementById('userName').textContent = '登录';
+                document.getElementById('userAvatar').textContent = '登';
+                
+                // 隐藏用户菜单
+                document.getElementById('userMenu').style.display = 'none';
+                
+                // 设置点击跳转到登录页
+                setupLoginRedirect();
+            }
+        }
+        
+        // 设置已登录状态的菜单
+        function setupLoggedInMenu() {
+            const userInfo = document.getElementById('userInfo');
+            const userMenu = document.getElementById('userMenu');
+            
+            // 显示用户菜单
+            userMenu.style.display = '';
+            
+            // 点击头像显示/隐藏菜单
+            userInfo.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userMenu.classList.toggle('show');
+            });
+            
+            // 点击其他地方关闭菜单
+            document.addEventListener('click', function() {
+                userMenu.classList.remove('show');
+            });
+            
+            // 退出登录事件
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                logout();
+            });
+        }
+        
+        // 设置未登录状态的跳转
+        function setupLoginRedirect() {
+            const userInfo = document.getElementById('userInfo');
+            
+            userInfo.addEventListener('click', function() {
+                // 跳转到登录页面
+                window.location.href = '/magicflu/html/sites/userfiles/050af23a-90c9-4169-a182-cdf755e7a3a4/login.html';
+            });
+        }
+        
+        // 退出登录函数
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                // 清除登录状态
+                localStorage.removeItem(LOGIN_KEY);
+                localStorage.removeItem(LOGIN_USERNAME_KEY);
+                localStorage.removeItem(LOGIN_AVATAR_TEXT_KEY);
+                
+                // 刷新页面以更新状态
+                window.location.reload();
+            }
+        }
+        
+        // 模拟登录函数（实际应由登录页面调用）
+        function simulateLogin(username, avatarText) {
+            // 设置登录状态
+            localStorage.setItem(LOGIN_KEY, 'true');
+            localStorage.setItem(LOGIN_USERNAME_KEY, username);
+            localStorage.setItem(LOGIN_AVATAR_TEXT_KEY, avatarText);
+            
+            // 刷新页面
+            window.location.reload();
+        }
+        
+        // 功能点数据 - 更新了描述和图标
+        const functionData = {
+            approval: [
+                { 
+                    title: '净空审核审批流程', 
+                    desc: '机场净空区域的审核与审批流程管理，包括申请提交、资料审查、现场勘查、审批决策等环节的规范化处理', 
+                    icon: '📋',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=7f4c05bd-01a3-4f07-8e74-12a51a45ea00&processKey=p-1fd81c1f-9f95-406b-ae3e-cd2c1d38a04d&fillType=newindow'
+                },
+                { 
+                    title: '不停航施工许可审批流程', 
+                    desc: '机场运行期间施工许可的审批流程，确保施工安全与航班正常运行的有效协同管理', 
+                    icon: '🏗️',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=7f4c05bd-01a3-4f07-8e74-12a51a45ea00&processKey=p-67395fd8-bb70-4dfd-bd73-7809aec24c35&fillType=newindow'
+                },
+                { 
+                    title: '受托行业验收审查内部流程', 
+                    desc: '受托行业项目的验收审查标准化流程，确保验收工作的规范性和完整性', 
+                    icon: '✅',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=7f4c05bd-01a3-4f07-8e74-12a51a45ea00&processKey=p-5cbf7b46-9ada-4f04-b678-d450c9dbf84c&fillType=newindow'
+                },
+                { 
+                    title: '总规范围内建设审批流程', 
+                    desc: '机场总体规划范围内建设项目的审批管理，确保建设活动符合总体规划要求', 
+                    icon: '📝',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=7f4c05bd-01a3-4f07-8e74-12a51a45ea00&processKey=p-fa509758-6d79-40f7-8c28-66fe8d272e34&fillType=newindow'
+                },
+                { 
+                    title: '任务看板', 
+                    desc: '实时展示各项任务的执行状态和进度，提供直观的任务管理视图和团队协作平台', 
+                    icon: '📊',
+                    link: '/magicflu/html/form/appController.jsp?appLabel=%E4%BB%BB%E5%8A%A1%E7%9C%8B%E6%9D%BF&nodeLabel=%E5%AE%A1%E6%89%B9%E4%BA%8B%E9%A1%B9&nodeId=1&spaceId=7f4c05bd-01a3-4f07-8e74-12a51a45ea00&appId=f61af007-f28c-4daf-8f36-23fa16ff630c'
+                },
+                { 
+                    title: '征求意见流程', 
+                    desc: '规范化征求相关方意见的流程管理，确保决策过程的透明性和科学性', 
+                    icon: '💬',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=7f4c05bd-01a3-4f07-8e74-12a51a45ea00&processKey=p-04c2cdee-2d3a-42e1-83c4-50d68509b20f&fillType=newindow'
+                }
+            ],
+            task: [
+                { 
+                    title: '日历视图显示', 
+                    desc: '以日历形式直观展示工作任务安排和时间节点，支持按月、周、日不同维度查看', 
+                    icon: '📅',
+                    link: ''
+                },
+                {
+                    title: '创建主任务并分解为各个部门任务',
+                    desc: '创建主任务并分派给各部门，支持分解和下发',
+                    icon: '🧭',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=a8474b7f-4347-4c30-86d2-f07f288a9f45&processKey=p-4e515109-2245-40fc-a131-f78221fb99bf&fillType=newindow'
+                },
+                {
+                    title: '创建部门任务并分解为各个人任务',
+                    desc: '创建部门级任务并分解为个人任务、分配执行人',
+                    icon: '👥',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=a8474b7f-4347-4c30-86d2-f07f288a9f45&processKey=p-3f1e3634-ec84-4488-85cd-674029c0c23b&fillType=newindow'
+                },
+                {
+                    title: '将已有的部门任务分解为各个人任务',
+                    desc: '把现有部门任务拆解为个人待办并分配',
+                    icon: '🔧',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=a8474b7f-4347-4c30-86d2-f07f288a9f45&processKey=p-7da98731-bbed-4764-8de0-c25ee1b62796&fillType=newindow'
+                },
+                { 
+                    title: '主任务跟踪管理',
+                    desc: '部门主任务提交和审核，主任务的审核运行与跟踪',
+                    icon: '📝',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=a8474b7f-4347-4c30-86d2-f07f288a9f45&processKey=p-fb5504e7-e8d6-4aa1-830e-bf8710bbd0a4&fillType=newindow'
+                },
+                {
+                    title: '部门任务跟踪管理',
+                    desc: '部门内部对于个人子任务的跟踪、审核与管理',
+                    icon: '📊',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=a8474b7f-4347-4c30-86d2-f07f288a9f45&processKey=p-f735692b-d728-47ff-becc-3aee8320dfc7&fillType=newindow'
+                },
+                { 
+                    title: '电子会议记录本', 
+                    desc: '会议记录的电子化管理，支持会议内容的个人记录', 
+                    icon: '📖',
+                    link: '/magicflu/html/form/appController.jsp?appLabel=%E7%94%B5%E5%AD%90%E4%BC%9A%E8%AE%AE%E8%AE%B0%E5%BD%95%E6%9C%AC&nodeLabel=%E4%BC%9A%E8%AE%AE%E8%AE%B0%E5%BD%95%E8%A1%A8&nodeId=1&spaceId=a8474b7f-4347-4c30-86d2-f07f288a9f45&appId=7ad770dd-aa81-4442-8e0e-6a9ac26856bc'
+                },
+                { 
+                    title: '月例会材料收集管理', 
+                    desc: '月度例会材料的统一收集、整理和归档管理，确保会议工作资料的完整性', 
+                    icon: '📁',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=a8474b7f-4347-4c30-86d2-f07f288a9f45&processKey=p-f1f3f110-5773-4729-985f-1fe480344e53&fillType=newindow'
+                }
+            ],
+            supervision: [
+                { 
+                    title: '人员资质和培训审查系统', 
+                    desc: '员工资质档案管理和培训记录审查系统，支持资质证书上传、培训计划安排、培训记录归档等功能', 
+                    icon: '👤',
+                    link: ''
+                },
+                { 
+                    title: '机场基础数据库', 
+                    desc: '机场基本信息、设施设备、人员配置等基础数据的收集、管理和查询系统，为监管提供数据支持', 
+                    icon: '🗄️',
+                    link: ''
+                },
+                { 
+                    title: '机场细则审查系统', 
+                    desc: '机场运行细则的审查与管理，确保各项细则符合法规要求和安全标准', 
+                    icon: '🔍',
+                    link: ''
+                },
+                { 
+                    title: '机场使用手册电子审查系统', 
+                    desc: '机场使用手册的电子审查、版本管理和在线签名系统，提高审查效率和准确性', 
+                    icon: '📚',
+                    link: ''
+                },
+                { 
+                    title: '机场末梢岗位标准工作程序', 
+                    desc: '机场各岗位标准工作程序的制定、更新和执行监督，确保操作规范的一致性', 
+                    icon: '⚙️',
+                    link: ''
+                },
+                { 
+                    title: '使用许可证管理系统', 
+                    desc: '机场使用许可证的申请、审批、发放和查询系统，实现许可证的全生命周期管理', 
+                    icon: '📜',
+                    link: ''
+                },
+                { 
+                    title: '一鸟一策监管实施监管系统', 
+                    desc: '针对鸟类活动的专项监管和应对策略管理系统，提升鸟击防范工作的科学性', 
+                    icon: '🐦',
+                    link: ''
+                },
+                { 
+                    title: '机场专用设备维修保养监管系统', 
+                    desc: '机场专用设备维修保养计划制定、执行监督和效果评估的监管系统', 
+                    icon: '🔧',
+                    link: ''
+                },
+                { 
+                    title: '机场外来物监管系统', 
+                    desc: '机场外来物的检测、统计分析和预防措施监管，提升跑道运行安全水平', 
+                    icon: '🚫',
+                    link: ''
+                },
+                { 
+                    title: '监管局内部制度查询系统', 
+                    desc: '监管局内部规章制度和政策的查询系统，方便员工快速查找和了解相关规定', 
+                    icon: '⭐',
+                    link: ''
+                },
+                { 
+                    title: '发起事件调查流程', 
+                    desc: '发起事件调查流程，全过程的跟踪整个事件调查报告的编写、审核与归档', 
+                    icon: '📄',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=c97603ce-ac50-442f-ab9c-08b853890d8d&processKey=p-5548e2e7-539c-4178-b51c-a214c726ccd5&fillType=newindow'
+                },
+                { 
+                    title: '文本差异比较工具', 
+                    desc: '支持直接粘贴文本或上传文件，快速、直观地比对差异', 
+                    icon: '🔀',
+                    link: 'http://10.96.242.77:10001/diff-toolbox',
+                },
+                { 
+                    title: '公安数据采集-危害民航运输类案件统计', 
+                    desc: '危害民航运输类案件统计数据的采集、整理和分析', 
+                    icon: '👮',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=c97603ce-ac50-442f-ab9c-08b853890d8d&processKey=p-fd3abbf7-b746-44c0-8b07-2c386f20eb3b&fillType=newindow'
+                },
+                { 
+                    title: '公安数据采集-江苏地区民用运输机场最高类别航空器起降架次统计', 
+                    desc: '江苏地区民用运输机场最高类别航空器起降架次统计数据的采集、整理和分析', 
+                    icon: '👮',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=c97603ce-ac50-442f-ab9c-08b853890d8d&processKey=p-00ded96e-0c4e-4079-8def-0c944cb7610d&fillType=newindow'
+                },
+                { 
+                    title: '公安数据采集-监管局数据采集', 
+                    desc: '监管局数据采集、整理和分析', 
+                    icon: '👮',
+                    link: '/magicflu/html/bpm/startProcess.jsp?spaceId=c97603ce-ac50-442f-ab9c-08b853890d8d&processKey=p-6b9a9d3d-1a35-4f8a-abd8-bc5338268702&fillType=newindow'
+                }
+
+            ]
+        };
+
+        // 导航树和任务中心的特殊链接
+        const specialLinks = {
+            approval: {
+                'nav-tree-1': '/magicflu/html/form/main.jsp?spaceId=7f4c05bd-01a3-4f07-8e74-12a51a45ea00&appId=a305701f-4b04-49ac-8c43-c58148465f6c&redirect=true&hideTopMenu=true',
+                'nav-tree-2': '/magicflu/html/form/main.jsp?spaceId=7f4c05bd-01a3-4f07-8e74-12a51a45ea00&appId=5812126d-ff48-4eb1-aa10-5297f11fd974&redirect=true&hideTopMenu=true',
+                'task-center': '/magicflu/html/form/appController.jsp?appLabel=%E4%BB%BB%E5%8A%A1%E4%B8%AD%E5%BF%83&nodeLabel=%E8%A1%8C%E6%94%BF%E8%AE%B8%E5%8F%AF%E5%AE%A1%E6%89%B9%E4%BA%8B%E9%A1%B9%E5%86%85%E9%83%A8%E4%BA%8B%E9%A1%B9%E7%AE%A1%E7%90%86&nodeId=1&spaceId=7f4c05bd-01a3-4f07-8e74-12a51a45ea00&appId=e05def8e-2e62-4a35-af4b-d4acded4fa3a'
+            },
+            task: {
+                'nav-tree-1': '/magicflu/html/form/main.jsp?spaceId=a8474b7f-4347-4c30-86d2-f07f288a9f45&appId=d1e51687-72c6-4424-9fde-d15608a4317c&redirect=true&hideTopMenu=true',
+                'nav-tree-2': '/magicflu/html/form/main.jsp?spaceId=a8474b7f-4347-4c30-86d2-f07f288a9f45&appId=a4be3e15-b41b-478f-94be-0cf3d13d22d1&redirect=true&hideTopMenu=true',
+                'task-center': '/magicflu/html/form/appController.jsp?appLabel=%E4%BB%BB%E5%8A%A1%E4%B8%AD%E5%BF%83&nodeLabel=%E5%B7%A5%E4%BD%9C%E4%BB%BB%E5%8A%A1%E7%AE%A1%E7%90%86&nodeId=1&spaceId=a8474b7f-4347-4c30-86d2-f07f288a9f45&appId=be975310-57a0-4ec4-b40d-1aa2f36c3602'
+            },
+            supervision: {
+                'nav-tree-1': 'magicflu/html/form/main.jsp?spaceId=c97603ce-ac50-442f-ab9c-08b853890d8d&appId=2e5e9347-ddbd-4a06-948f-3e8b54bc1ccd&redirect=true&hideTopMenu=true',
+                'nav-tree-2': 'magicflu/html/form/main.jsp?spaceId=c97603ce-ac50-442f-ab9c-08b853890d8d&appId=1fff6d71-9bce-4886-8b84-700a04b9529d&redirect=true&hideTopMenu=true',
+                'nav-tree-3': 'magicflu/html/form/main.jsp?spaceId=c97603ce-ac50-442f-ab9c-08b853890d8d&appId=25fd4572-87e5-4f00-aaf8-ed6129182a3e&redirect=true&hideTopMenu=true',
+                'task-center': '/magicflu/html/form/appController.jsp?appLabel=%E4%BB%BB%E5%8A%A1%E4%B8%AD%E5%BF%83&nodeLabel=%E5%AE%89%E5%85%A8%E9%9D%9E%E7%8E%B0%E5%9C%BA%E7%9B%91%E7%AE%A1%E7%B3%BB%E7%BB%9F&nodeId=1&spaceId=c97603ce-ac50-442f-ab9c-08b853890d8d&appId=ede48ff9-4eb0-4fcc-89ad-6a6d180dca66'
+            }
+        };
+
+            // 每个系统的二级菜单配置（type: 内部标识，label: 显示文本）
+            const submenuConfig = {
+                approval: [
+                    { type: 'nav-tree-1', label: '导航树-行政许可审批系统' },
+                    { type: 'nav-tree-2', label: '导航树-征求意见系统' },
+                    { type: 'task-center', label: '任务中心' }
+                ],
+                task: [
+                    { type: 'nav-tree-1', label: '导航树-任务跟踪管理' },
+                    { type: 'nav-tree-2', label: '导航树-月例会材料收集' },
+                    { type: 'task-center', label: '任务中心' }
+                ],
+                supervision: [
+                    { type: 'nav-tree-1', label: '导航树-公安数据采集系统' },
+                    { type: 'nav-tree-2', label: '导航树-事件调查报告管理系统' },
+                    { type: 'nav-tree-3', label: '导航树-运输机场符合性和保障能力' },
+                    { type: 'task-center', label: '任务中心' }
+                ]
+            };
+
+            // 渲染二级菜单并绑定点击事件
+            function renderSubNav(system) {
+                const subNav = document.getElementById('subNav');
+                subNav.innerHTML = '';
+                const items = submenuConfig[system] || [];
+                items.forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'sub-menu';
+                    el.setAttribute('data-type', item.type);
+                    el.textContent = item.label;
+                    subNav.appendChild(el);
+                });
+
+                const subMenus = subNav.querySelectorAll('.sub-menu');
+                subMenus.forEach(menu => {
+                    menu.addEventListener('click', function() {
+                        const type = this.getAttribute('data-type');
+                        subMenus.forEach(m => m.classList.remove('active'));
+                        this.classList.add('active');
+
+                        const link = (specialLinks[currentSystem] && specialLinks[currentSystem][type]) || '';
+                        if (link) {
+                            window.open(link, '_blank');
+                            console.log(`正在跳转到: ${link}`);
+                        } else {
+                            alert(`"${currentSystem} 系统的 ${this.textContent}" 功能正在建设中。`);
+                        }
+                    });
+                });
+            }
+
+            // 当前选中的系统
+            let currentSystem = 'approval';
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化登录状态
+            initLoginStatus();
+            
+            // 一级菜单点击事件
+            const systemMenus = document.querySelectorAll('.system-menu');
+            systemMenus.forEach(menu => {
+                menu.addEventListener('click', function() {
+                    const systemId = this.getAttribute('data-system');
+                    
+                    // 更新一级菜单状态
+                    systemMenus.forEach(m => m.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 更新当前系统并重渲染二级菜单
+                    currentSystem = systemId;
+                    renderSubNav(currentSystem);
+                    // 加载详细视图
+                    loadDetailView(systemId);
+                });
+            });
+            // 二级菜单由 renderSubNav 负责渲染与绑定
+
+            // 渲染默认二级菜单并加载默认内容
+            renderSubNav(currentSystem);
+            loadDetailView('approval');
+        });
+
+        // 加载详细视图
+        function loadDetailView(system) {
+            const contentGrid = document.getElementById('contentGrid');
+            
+            // 显示加载状态
+            contentGrid.innerHTML = `
+                <div class="content-loading">
+                    <div class="spinner"></div>
+                </div>
+            `;
+            
+            // 模拟加载延迟，使过渡更自然
+            setTimeout(() => {
+                // 获取功能点数据
+                const functions = functionData[system] || [];
+                
+                if (functions.length === 0) {
+                    contentGrid.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <div class="empty-text">暂无功能点</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // 清空并重新填充内容
+                contentGrid.innerHTML = '';
+                
+                // 创建功能卡片
+                functions.forEach((func, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'feature-card';
+                    card.style.animationDelay = `${index * 0.05}s`;
+                    
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <div class="card-icon">${func.icon}</div>
+                            <div>
+                                <div class="card-title">${func.title}</div>
+                            </div>
+                        </div>
+                        <div class="card-description">${func.desc}</div>
+                    `;
+                    
+                    card.addEventListener('click', function() {
+                        // 添加点击反馈
+                        this.style.transform = 'translateY(-2px) scale(0.99)';
+                        setTimeout(() => {
+                            this.style.transform = '';
+                        }, 200);
+                        
+                        if (func.link) {
+                            // 在新标签页中打开链接
+                            window.open(func.link, '_blank');
+                            console.log(`正在跳转到: ${func.link}`);
+                        } else {
+                            alert(`"${func.title}"功能正在建设中，链接暂未配置。`);
+                            console.warn(`功能"${func.title}"未配置跳转链接。`);
+                        }
+                    });
+                    
+                    contentGrid.appendChild(card);
+                });
+            }, 300); // 300ms的延迟，使加载更自然
+        }
+        
+        // 为测试方便，添加一个模拟登录的全局函数（实际应用中应由登录页面调用）
+        window.simulateLogin = simulateLogin;
+    </script>
+</body>
+</html>
