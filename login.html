@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>监管局内部管理系统 - 登录</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', 'Segoe UI', 'PingFang SC', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-wrapper {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .system-title {
+            color: #fff;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        
+        .system-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            font-weight: 400;
+        }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .login-container:hover {
+            transform: translateY(-2px);
+        }
+        
+        .form-header {
+            background: linear-gradient(135deg, #2c5282 0%, #4299e1 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .form-header h2 {
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        .form-header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .form-content {
+            padding: 40px;
+        }
+        
+        .input-group {
+            margin-bottom: 28px;
+            position: relative;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #2d3748;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #4299e1;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+        }
+        
+        .input-group input::placeholder {
+            color: #a0aec0;
+        }
+        
+        .input-icon {
+            position: absolute;
+            right: 16px;
+            top: 42px;
+            color: #a0aec0;
+        }
+        
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #2c5282 0%, #4299e1 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        
+        .login-btn:hover {
+            background: linear-gradient(135deg, #2b6cb0 0%, #3182ce 100%);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+        }
+        
+        .login-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+        }
+        
+        @media (max-width: 480px) {
+            .form-content {
+                padding: 30px 20px;
+            }
+            
+            .form-header {
+                padding: 25px 20px;
+            }
+            
+            .system-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-header">
+            <h1 class="system-title">监管局内部管理系统</h1>
+            <p class="system-subtitle">安全 · 高效 · 专业 · 协同</p>
+        </div>
+        
+        <div class="login-container">
+            <div class="form-header">
+                <h2>用户登录</h2>
+                <p>请使用您的账号登录系统</p>
+            </div>
+            
+            <div class="form-content">
+                <!-- 登录表单 -->
+                <form id="login-form" action="#" method="post">
+                    <!-- 用户名输入框 -->
+                    <div class="input-group">
+                        <label for="username-field">用户名</label>
+                        <input 
+                            autocomplete="username" 
+                            id="username-field" 
+                            name="username"
+                            placeholder="请输入用户名" 
+                            type="text" 
+                        />
+                        <div class="input-icon">👤</div>
+                    </div>
+                    
+                    <!-- 密码输入框 -->
+                    <div class="input-group">
+                        <label for="password-field">密码</label>
+                        <input 
+                            autocomplete="current-password" 
+                            id="password-field" 
+                            name="password"
+                            placeholder="请输入登录密码" 
+                            type="password" 
+                        />
+                        <div class="input-icon">🔒</div>
+                    </div>
+                    
+                    <!-- 登录按钮 -->
+                    <button 
+                        class="login-btn" 
+                        id="login-btn" 
+                        type="submit"
+                    >
+                        登录系统
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>© 2026 监管局内部管理系统 | 仅限内部授权使用</p>
+        </div>
+    </div>
+</body>
+</html>
